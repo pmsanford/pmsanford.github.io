@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>writing code with paul</title>
-    <link>https://pmsanford.github.io/</link>
-    <description>Recent content on writing code with paul</description>
+    <title>Posts on writing code with paul</title>
+    <link>https://pmsanford.github.io/posts/</link>
+    <description>Recent content in Posts on writing code with paul</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 24 Oct 2018 11:54:35 -0700</lastBuildDate>
     
-	<atom:link href="https://pmsanford.github.io/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://pmsanford.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>

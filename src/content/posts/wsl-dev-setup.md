@@ -1,7 +1,7 @@
 ---
 title: "WSL Dev Setup"
 date: 2018-10-24T11:54:35-07:00
-draft: true
+draft: false
 ---
 
 ## Prereqs
