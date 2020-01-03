@@ -4,15 +4,4 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
-
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
-
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
-
-
-[jekyll-organization]: https://github.com/jekyll
+I lived in Florida for 29 years, first Pensacola and then Jacksonville. I moved to Mountain View and then San Francisco afterwards. I enjoy taking photos, but my interest in it ebbs and flows. I collect hobbies that wash in and out of my life like the tides. If I can manage to keep this one on land, hopefully you can read about the rest of them here.
