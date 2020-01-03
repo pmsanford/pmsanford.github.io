@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "Advent of Code 2019 - Day 1 Part 1"
-date:   2020-01-02 19:53:12 -0800
-categories: aoc2019 fortran
+category: advent-of-code
+tags: aoc2019 fotran
 ---
 Intro
 -----
@@ -40,14 +40,14 @@ Looping
 
 The `do` loop is overloaded - all the loops are `do` loops. Here, we want to loop until we're out of lines in our file.
 
-{% highlight fortran %}
+```fortran
 do
   read (unit=input_file, fmt=*, end=10) current
   total = total + ((current/3) - 2)
 end do
 
 10 close(input_file)
-{% endhighlight %}
+```
 
 The unit for the read statement is, of course, the unit number we opened before. There is some non-obvious stuff going on here too:
 
@@ -56,7 +56,7 @@ The unit for the read statement is, of course, the unit number we opened before.
 
 That's all there is for part one. Here's the full program:
 
-{% highlight fortran %}
+```fortran
 program exercise
   implicit none
   integer, parameter :: input_file = 20
@@ -75,7 +75,7 @@ program exercise
   print *, total
 
 end program exercise
-{% endhighlight %}
+```
 
 
 There's one more interesting thing here: `implicit none`: In Fortran, variables can be implicitly assigned a type. Variables starting with letters i through n are type `integer`, while all others are type `real`. using `implicit none` causes implicit variable definitions to be treated as errors. From what I've read, all modern fortran should use `implicit none`.
