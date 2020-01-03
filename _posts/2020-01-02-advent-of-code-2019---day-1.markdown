@@ -52,7 +52,7 @@ The unit for the read statement is, of course, the unit number we opened before.
 - `fmt=*` specifies the format of the data to read. Specifying `*` is called "list-directed" formatting, which means the list of variables afterwards determines how we'll read the data. We provide an integer (the `current`) variable, and so Fortran will try to read one integer from each line of input. We'll see more advanced `fmt` directives in the future.
 - `end=10` specifies that when Fortran encounters the end of the file, it should jump to the line labelled `10`. There are more modern ways to handle this, but for now, we'll stick with a GOTO.
 
-That's basically it for part one. Here's the full program:
+That's all there is for part one. Here's the full program:
 
 {% highlight fortran %}
 program exercise
