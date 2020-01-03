@@ -11,6 +11,8 @@ Welcome to my extremely late Advent of Code series.
 
 Each year, I do Advent of Code with a language I've never used (or at least never used in anything serious). Previous years I've used Rust, Erlang, and Scheme. One unifying theme for this, though, is that I get about six days in and stop. Usually to do something frivolous like spend time with my family during the holidays. This year, I've decided to try to push myself through by writing about each solution. I've already completed six days of 25, so these first few will be written in retrospect.
 
+The first few are fairly simple, so I'll concentrate more on Fortran than the problems themselves. Once we get to the meatier ones I'll focus more on the solutions than the syntax.
+
 This year I've decided on Fortran. Initially it was interesting to me because of its history; It's [62 years old][fortran-wikipedia]. It's the precursor to most popular programming languages still in use today. Many design choices are familiar, but there are a lot of "archaic" ideas in it that the language design community has moved away from. I hope to write about some of the more interesting ones here. 
 
 I'd like to thank the authors of the [Fortran wikibook][fortran-wikibook], which has been my primary resource in learning to solve these problems in Fortran. I've also used the [gfortran docs][gfortran-docs] for the specifics of the built-ins available.
