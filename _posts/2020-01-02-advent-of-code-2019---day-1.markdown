@@ -18,7 +18,7 @@ I'd like to thank the authors of the [Fortran wikibook][fortran-wikibook], which
 Part One
 --------
 
-The first day is usually extremely simple. This is nice because it gives me a chance to flounder around figuring out the language, learning how to do basic things like reading files. This year is no different: The instructions are to simply take a list of numbers, apply a fixed formula to them (`floor(x/3) - 2`) and sum them all up. So we'll learn reading files, math, and looping.
+The first day is usually extremely simple. This is nice because it gives me a chance to flounder around figuring out the language, learning how to do basic things like reading files. This year is no different: The instructions are to simply take a list of numbers, apply a fixed formula (`floor(x/3) - 2`) to them, and sum them all up. So we'll learn reading files, math, and looping.
 
 
 Reading Files
