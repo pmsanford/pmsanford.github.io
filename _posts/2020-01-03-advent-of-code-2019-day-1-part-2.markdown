@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Advent of Code 2019 - Day 1 Part 2"
+title:  "AoC2019 - Day 1 Part 2: Functions"
 category: advent-of-code
 tags: aoc2019 fotran
 ---
