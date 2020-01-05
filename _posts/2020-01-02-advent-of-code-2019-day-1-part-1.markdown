@@ -7,7 +7,7 @@ tags: aoc2019 fotran
 Intro
 -----
 
-Welcome to my extremely late Advent of Code series.
+Welcome to my extremely late [Advent of Code][aoc] series.
 
 Each year, I do Advent of Code with a language I've never used (or at least never used in anything serious). Previous years I've used Rust, Erlang, and Scheme. One unifying theme for this, though, is that I get about six days in and stop. Usually to do something frivolous like spend time with my family during the holidays. This year, I've decided to try to push myself through by writing about each solution. I've already completed six days of 25, so these first few will be written in retrospect.
 
@@ -83,3 +83,4 @@ There's one more interesting thing here: `implicit none`: In Fortran, variables 
 [fortran-wikipedia]: https://en.wikipedia.org/wiki/Fortran
 [fortran-wikibook]: https://en.wikibooks.org/wiki/Fortran
 [gfortran-docs]: https://gcc.gnu.org/onlinedocs/gfortran/Intrinsic-Procedures.html
+[aoc]: https://adventofcode.com/
