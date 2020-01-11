@@ -85,13 +85,21 @@ arr_one = 3 ! Set every element to 3
 arr_one = (/1, 2, 3, 4, 5, 6/) ! Initialize every element at once
 
 arr_two(1, 1) = 5 ! Set the first element of the first array to 5
-arr_two = reshape((/1, 2, 3, 4, 5, 6/), shape(arr_two)) ! Initialize all arrays
 
 arr_three(0) = 5 ! Set the first element to 5 (yes, you can set the indexing)
 
 arr_four(-2) = 5 ! Set the first element to 5 (I know right)
+
+
+arr_two = reshape((/1, 2, 3, 4, 5, 6/), shape(arr_two)) ! Initialize all arrays
 ```
 
+One interesting tidbit about that last one: Arrays are represented in memory in column-major order. So the last line above is equivalent to:
+
+```fortran
+arr_two(1, :) = (/1, 3, 5/)
+arr_two(2, :) = (/2, 4, 6/)
+```
 
 Allocation
 ==========
@@ -107,3 +115,26 @@ allocate(character(len=4) :: str_one)
 ```
 
 Allocatable variables are automatically deallocated when they go out of scope. They are also guaranteed to be contiguous in memory (unlike memory allocated to pointers) which makes it more efficient to pass them around. The only downside is they can't alias existing memory. You also have to know the rank (number of dimensions) up front (but this is also true for pointers). 
+
+
+CSV Parsing
+===========
+
+The first step is writing a CSV parser so we can load the initial state of our virtual machine's memory. Ok, we could write something to process some hard-coded values, but I'm doing this first. I'll end up revisiting this later on when the CSV data gets more complicated but for now I'll be using boolean arrays to help me parse them. Fortran documentation refers to these as `masks`. There are a few intrinsics that work on masks, like `COUNT`, which will tell you the number of `true`s in the mask.
+
+My plan was, at first, to use what is a pretty cool consequence of the implicit-element-wise array assignment we saw earlier:
+
+```fortran
+integer :: my_ints(10)
+logical :: my_mask(10) ! logical is the boolean type
+
+my_ints = (/1, 2, 3, 4, 1, 2, 3, 4, 1, 2/)
+
+my_mask = my_ints > 2
+
+write(*,*) my_mask ! writing to the fileno * and format * writes to stdout with automatic formatting
+
+! This prints F F T T F F T T F F
+```
+
+Cool, right? Unfortunately, strings (`character(len=10) :: str`) and character arrays (`character :: str(10)`) are not the same thing. So `my_mask = str == ','` doesn't work as expected.
