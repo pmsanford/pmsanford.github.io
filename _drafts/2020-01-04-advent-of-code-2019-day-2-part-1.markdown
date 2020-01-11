@@ -137,4 +137,170 @@ write(*,*) my_mask ! writing to the fileno * and format * writes to stdout with 
 ! This prints F F T T F F T T F F
 ```
 
-Cool, right? Unfortunately, strings (`character(len=10) :: str`) and character arrays (`character :: str(10)`) are not the same thing. So `my_mask = str == ','` doesn't work as expected.
+Cool, right? Unfortunately, strings (`character(len=10) :: str`) and character arrays (`character :: str(10)`) are not the same thing. So `my_mask = str == ','` doesn't work as hoped. Since I'd already settled on it, here's the implementation I ended up with:
+
+```fortran
+  do i = 1, sz
+    cur = content(i:i)
+    sepmask(i) = cur == ','
+  end do
+
+  icount = COUNT(sepmask) + 1
+  allocate (integer :: instructions(icount))
+
+  ctr = 2
+  read (content, *) instructions(1)
+  do i = 1, sz
+    if (sepmask(i)) then
+      read (content(i + 1:), *) instructions(ctr)
+      ctr = ctr + 1
+    end if
+  end do
+```
+
+Here we're using what's called an __internal read__ to read values from the string variable `content` instead of from a file. We're looping over the mask array and for each true value, reading an integer from that index forward. Fortran knows to stop reading an integer when it encounters a non-number character (the next comma), so this works.
+
+Now obviously, we don't need the mask at all here. The only thing it's really being used for is the `COUNT` function, which we could easily recover from the loop. Also, this CSV parser will only work for CSVs where the values are all numbers. But this is good enough for now.
+
+
+Virtual Machine
+===============
+
+Virtual Machine sounds fancy, but for this architecture the actual machinery is pretty simple. You just do these things in a loop:
+
+1. Read value (`op`) at instruction pointer (`ptr`) (which is initially set to the first index, 1)
+2. If the value is 99, break out of the loop (halt the machine)
+3. Read the arguments at ptr+1 (`lhs` or left-hand side) and ptr+2 (`rhs` or right-hand side). Remember that these are addresses, so we have to look up the values based on these destinations.
+5. Read the destination (`dst`) at ptr+3
+4. If op is 1, add lhs and rhs and store the value at dst
+5. If op is 2, multiply lhs and rhs and store the value at dst
+6. Increment the instruction pointer to the next instruction
+
+So let's see how that looks in Fortran:
+
+```fortran
+  do
+    if (ptr > icount) then
+      write (*, *) "Program terminated abnormally"
+    end if
+    op = instructions(ptr)
+    write (*, *) "Processing op ", op
+    if (op == 99) then
+      write (*, *) "Program terminated"
+      exit
+    end if
+    ptr = ptr + 1
+    lhs = instructions(ptr)
+    ptr = ptr + 1
+    rhs = instructions(ptr)
+    ptr = ptr + 1
+    dst = instructions(ptr)
+    if (dst < 0 .OR. dst >= icount .OR. lhs < 0 .OR. lhs >= icount .OR. rhs < 0 .OR. rhs >= icount) then
+      write (*, *) "Segmentation fault. ptr: ", ptr
+      write (*, *) "O: ", op, " L: ", lhs, " R: ", rhs, " D: ", dst
+      exit
+    end if
+    if (op == 1) then
+      res = instructions(lhs + 1) + instructions(rhs + 1)
+    else if (op == 2) then
+      res = instructions(lhs + 1)*instructions(rhs + 1)
+    else
+      write (*, *) "Unknown op code ", op, " at position ", ptr
+      exit
+    end if
+    write (*, *) "O: ", op, " L: ", lhs, " R: ", rhs, " D: ", dst, " P: ", res
+    instructions(dst + 1) = res
+    ptr = ptr + 1
+  end do
+```
+
+You can see I've added some debug statements and error checking, like making sure dst and the pointers aren't outside the bounds of the array.
+
+
+Full Program
+============
+
+That's pretty much it. I'll reproduce the program in full here, but they're getting a little big. In the future I'll just link to the repo with the code in it. The only thing we haven't covered here is writing out the full memory state at the end. This isn't necessary, but was nice for debugging.
+
+```fortran
+program exercise
+  integer :: infile = 20, sz, icount, op, lhs, rhs, dst, res, ptr, ctr, ofile = 21
+  integer, allocatable :: instructions(:)
+  character(:), allocatable :: content
+  logical, allocatable :: sepmask(:)
+  character :: cur
+
+  open (unit=infile, file='two.input', action='read')
+  inquire (unit=infile, size=sz)
+  allocate (character(sz) :: content)
+  allocate (logical :: sepmask(sz))
+  read (infile, '(A)') content
+  close (infile)
+
+  do i = 1, sz
+    cur = content(i:i)
+    sepmask(i) = cur == ','
+  end do
+
+  icount = COUNT(sepmask) + 1
+  allocate (integer :: instructions(icount))
+
+  ctr = 2
+  read (content, *) instructions(1)
+  do i = 1, sz
+    if (sepmask(i)) then
+      read (content(i + 1:), *) instructions(ctr)
+      ctr = ctr + 1
+    end if
+  end do
+
+  ptr = 1
+
+  do
+    if (ptr > icount) then
+      write (*, *) "Program terminated abnormally"
+    end if
+    op = instructions(ptr)
+    write (*, *) "Processing op ", op
+    if (op == 99) then
+      write (*, *) "Program terminated"
+      exit
+    end if
+    ptr = ptr + 1
+    lhs = instructions(ptr)
+    ptr = ptr + 1
+    rhs = instructions(ptr)
+    ptr = ptr + 1
+    dst = instructions(ptr)
+    if (dst < 0 .OR. dst >= icount .OR. lhs < 0 .OR. lhs >= icount .OR. rhs < 0 .OR. rhs >= icount) then
+      write (*, *) "Segmentation fault. ptr: ", ptr
+      write (*, *) "O: ", op, " L: ", lhs, " R: ", rhs, " D: ", dst
+      exit
+    end if
+    if (op == 1) then
+      res = instructions(lhs + 1) + instructions(rhs + 1)
+    else if (op == 2) then
+      res = instructions(lhs + 1)*instructions(rhs + 1)
+    else
+      write (*, *) "Unknown op code ", op, " at position ", ptr
+      exit
+    end if
+    write (*, *) "O: ", op, " L: ", lhs, " R: ", rhs, " D: ", dst, " P: ", res
+    instructions(dst + 1) = res
+    ptr = ptr + 1
+  end do
+
+  open (unit=ofile, file='two.output', action='write', status='replace')
+
+  do i = 1, icount
+    write (ofile, '(I0)', advance='no') instructions(i)
+    if (i .NE. icount) then
+      write (ofile, '(A)', advance='no') ','
+    end if
+  end do
+  close (ofile)
+
+  write (*, *) "Instruction count: ", icount
+
+end program exercise
+```
