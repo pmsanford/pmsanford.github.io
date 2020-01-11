@@ -6,16 +6,16 @@ tags: aoc2019 fotran
 ---
 The Problem
 -----------
-Ok, we're into the interesting stuff now. The problem for this one is to build a [virtual machine][https://en.wikipedia.org/wiki/System_virtual_machine] for an elfen computer architecture called Intcode. This is exciting for me, because I've been interested in these kinds of toy architectures [for a while][https://github.com/pmsanford/sic-debug]. The first part of this article is going to be a slightly expanded rehash of the description in [the problem description][https://adventofcode.com/2019/day/2] on the AoC website.
+Ok, we're into the interesting stuff now. The problem for this one is to build a [virtual machine](https://en.wikipedia.org/wiki/System_virtual_machine) for an elfen computer architecture called Intcode. This is exciting for me, because I've been interested in these kinds of toy architectures [for a while](https://github.com/pmsanford/sic-debug). The first part of this article is going to be a slightly expanded rehash of the description in [the problem description](https://adventofcode.com/2019/day/2) on the AoC website.
 
-We're going to simulate an extremely simple computer. Here's an extremely simplified description of how processors execute a program:
+We're going to simulate a very simple computer. Here's an extremely simplified description of how processors execute a program:
 
 1. Start by reading a number (called an __opcode__) at a specific location in memory. This is called the __entry point__.
 2. Based on this number, perform a single operation. This might involve:
-  a. Loading one or more __arguments__ from the memory location(s) following the instruction.
-  b. Storing the result of the operation
+  * Loading one or more __arguments__ from the memory location(s) following the instruction.
+  * Storing the result of the operation
 3. Advance the __instruction pointer__ by a certain amount. In the current exercise, the instruction pointer is always advanced by __4__ - we'll see why in a moment.
-4. Unless the opcode says otherwise, start again at step 1, except instead of the __entry point__, read an __opcode__ from the location referred to by the __instruction pointer__.
+4. Unless the opcode says otherwise, start again at step 1. This time, instead of the __entry point__, read an __opcode__ from the location referred to by the __instruction pointer__.
 
 The operations our Intcode computer is expected to perform (and the numbers they're represented by) are:
 
@@ -34,17 +34,17 @@ So, let's take a look at the example program from Advent of Code (here broken in
 `99`
 `30,40,50`
 
-You might notice that there are numbers in memory following the `HALT` instruction - since this computer (like the computer on which you're reading this) doesn't segregate executable instructions from data, any data upon which you want to operate shares space with the processor instructions. This last triplet is just data.
+You might notice that there are values in memory following the `HALT` instruction - since this computer (like the computer on which you're reading this) doesn't segregate executable instructions from data, any data upon which you want to operate shares space with the processor instructions. This last triplet is just data, and won't be executed by our processor (absent any bugs).
 
 The first instruction is broken down like this:
 
 `1`: This is the opcode for ADD.
 
-`9`: This is the __location of__ the first number we'll be adding. Since the first memory location is 0, this address refers to the 10th number in the list. If we count up, we find this is `30`, the number immediately following the `HALT` instruction in the full program.
+`9`: This is the __location of__ the first number we'll be adding. Since the first memory address is 0, this argument refers to the 10th value in memory. If we count up, we find this is `30`, the value immediately following the `HALT` instruction in the full program.
 
-`10`: This is the location of the second number, which is `40` (immediately following the previous number).
+`10`: This is the address of the second argument, which is `40` (immediately following the previous one).
 
-`3`: This is another location: The location to store the result. Notice that this is the 4th part of this instruction. We started this instruction at 0, so this memory location actually refers to itself.
+`3`: This is another address: The location to store the result. Notice that this is the 4th part of this instruction. We started this instruction at 0, so this memory location actually refers to itself.
 
 So then, when our VM encounters this instruction, it should add __[9]__ (which contains the number 30) to __[10]__ (which contains the number 40) and store the result at __[3]__. After executing the first instruction, the memory should look like this:
 
@@ -53,7 +53,7 @@ So then, when our VM encounters this instruction, it should add __[9]__ (which c
 `99`
 `30,40,50`
 
-The next instruction at __[4]__ is a multiply instruction, __[3]__ * __[11]__ stored at __[0]__ (which means it's overwriting the opcode from the previous instruction. After that we move the instruction pointer up 4 again, to __[8]__ which contains the `HALT` instruction. The final state of memory is:
+The next instruction at __[4]__ is a multiply instruction, __[3]__ * __[11]__ stored at __[0]__ (which means it's overwriting the opcode from the previous instruction). After that we move the instruction pointer up 4 again, to __[8]__ which contains the `HALT` instruction. The final state of memory is:
 
 `3500,9,10,70`
 `2,3,11,0`
@@ -158,9 +158,9 @@ Cool, right? Unfortunately, strings (`character(len=10) :: str`) and character a
   end do
 ```
 
-Here we're using what's called an __internal read__ to read values from the string variable `content` instead of from a file. We're looping over the mask array and for each true value, reading an integer from that index forward. Fortran knows to stop reading an integer when it encounters a non-number character (the next comma), so this works.
+Here we're using what's called an __internal read__ to read values from the string variable `content` instead of from a file. We're looping over the mask array and for each true value, reading an integer from that index forward. Fortran knows to stop reading an integer when it encounters a non-numeric character (in this case, the comma delimiting the field), so this works.
 
-Now obviously, we don't need the mask at all here. The only thing it's really being used for is the `COUNT` function, which we could easily recover from the loop. Also, this CSV parser will only work for CSVs where the values are all numbers. But this is good enough for now.
+You might be thinking "We don't need the mask at all here. What are you doing" and you'd be right. The only thing it's really being used for is the `COUNT` function, which we could easily recover from the loop. Also, this CSV parser will only work for CSVs where the values are all numbers. But this is good enough for now.
 
 
 Virtual Machine
@@ -168,19 +168,19 @@ Virtual Machine
 
 Virtual Machine sounds fancy, but for this architecture the actual machinery is pretty simple. You just do these things in a loop:
 
-1. Read value (`op`) at instruction pointer (`ptr`) (which is initially set to the first index, 1)
+1. Read the value (`op`) at the instruction pointer (`ptr`). This is initially set to the first address in memory, which is __[0]__. You might remember from above, though, that Fortran arrays start at 1 by default. This is a bit confusing, but you get used to it.
 2. If the value is 99, break out of the loop (halt the machine)
-3. Read the arguments at ptr+1 (`lhs` or left-hand side) and ptr+2 (`rhs` or right-hand side). Remember that these are addresses, so we have to look up the values based on these destinations.
+3. Read the arguments at ptr+1 (`lhs` or left-hand side) and ptr+2 (`rhs` or right-hand side). Remember that these are addresses, so we have to look up the actual values to operate on based on the addresses stored here.
 5. Read the destination (`dst`) at ptr+3
-4. If op is 1, add lhs and rhs and store the value at dst
-5. If op is 2, multiply lhs and rhs and store the value at dst
+4. If `op` is 1, add `lhs` and `rhs` and store the value at `dst`
+5. If `op` is 2, multiply `lhs` and `rhs` and store the value at `dst`
 6. Increment the instruction pointer to the next instruction
 
 So let's see how that looks in Fortran:
 
 ```fortran
   do
-    if (ptr > icount) then
+    if (ptr > icount) then ! We incremented the pointer past the end of the array - oops!
       write (*, *) "Program terminated abnormally"
     end if
     op = instructions(ptr)
@@ -214,7 +214,7 @@ So let's see how that looks in Fortran:
   end do
 ```
 
-You can see I've added some debug statements and error checking, like making sure dst and the pointers aren't outside the bounds of the array.
+You can see I've added some debug statements and error checking, like making sure dst and the pointers aren't outside the bounds of the array. You might also notice we keep adding 1 to all the addresses - this is because of Fortran's 1-indexed arrays that I mentioned above.
 
 
 Full Program
