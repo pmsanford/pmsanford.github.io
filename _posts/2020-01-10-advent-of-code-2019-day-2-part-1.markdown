@@ -11,7 +11,7 @@ Ok, we're into the interesting stuff now. The problem for this one is to build a
 We're going to simulate a very simple computer. Here's an extremely simplified description of how processors execute a program:
 
 1. Start by reading a number (called an __opcode__) at a specific location in memory. This is called the __entry point__.
-2. Based on this number, perform a single operation. This might involve:
+2. Based on this number, perform a single operation. In addition to the actual operation (such as addition or multiplication), this might involve:
   * Loading one or more __arguments__ from the memory location(s) following the instruction.
   * Storing the result of the operation
 3. Advance the __instruction pointer__ by a certain amount. In the current exercise, the instruction pointer is always advanced by __4__ - we'll see why in a moment.
